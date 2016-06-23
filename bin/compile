@@ -7,18 +7,21 @@ require 'multi_json'
 # sync output
 $stdout.sync = true
 
-build_dir = ARGV[1]
+build_dir = ARGV[0]
 
 app_json = MultiJson.decode(File.read(File.join(build_dir, 'app.json')))
 
-deps_json = app_json['dependencies'].to_json
-chamber_url = URI.parse(ENV.fetch('CHAMBER_HOST', 'https://chamber-production.herokuapp.com'))
-client = Net::HTTP.new(chamber_url.host, chamber_url.port)
+deps_json = app_json['dependencies']
+exit 0 if deps_json.nil?
+
+chamber_url = ENV.fetch('CHAMBER_URL', 'https://chamber-production.herokuapp.com')
+parsed_chamber_url = URI.parse(chamber_url)
+client = Net::HTTP.new(parsed_chamber_url.host, parsed_chamber_url.port)
 
 req = client.send_request(
         'PUT',
         '/v1/apps/#{app_uuid}/dependencies',
-        MultiJson.encode(deps_json),
+        deps_json.to_json,
         { "content-type" => "application/json" }
       )
 

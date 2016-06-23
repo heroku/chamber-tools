@@ -17,6 +17,7 @@ exit 0 if deps_json.nil?
 chamber_url = ENV.fetch('CHAMBER_URL', 'https://chamber-production.herokuapp.com')
 parsed_chamber_url = URI.parse(chamber_url)
 client = Net::HTTP.new(parsed_chamber_url.host, parsed_chamber_url.port)
+client.use_ssl = (parsed_chamber_url.scheme == "https")
 
 req = client.send_request(
         'PUT',

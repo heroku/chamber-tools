@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require 'net/http'
+require 'yaml'
 require 'json'
 require 'multi_json'
 
@@ -10,9 +11,16 @@ $stdout.sync = true
 build_dir = ARGV[0]
 
 app_json = MultiJson.decode(File.read(File.join(build_dir, 'app.json')))
+push_metadata = YAML.load(File.read('/app/tmp/push_metadata.yml'))
+
+app_uuid = push_metadata['app_info']['id']
+
+puts push_metadata
 
 deps_json = app_json['dependencies']
 exit 0 if deps_json.nil?
+
+deps_json = { depends_on: deps_json }
 
 chamber_url = ENV.fetch('CHAMBER_URL', 'https://chamber-production.herokuapp.com')
 parsed_chamber_url = URI.parse(chamber_url)
@@ -21,7 +29,7 @@ client.use_ssl = (parsed_chamber_url.scheme == "https")
 
 req = client.send_request(
         'PUT',
-        '/v1/apps/#{app_uuid}/dependencies',
+        "/v1/apps/#{app_uuid}/dependencies",
         deps_json.to_json,
         { "content-type" => "application/json" }
       )

@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+
+require 'net/http'
+require 'json'
+require 'multi_json'
+
+# sync output
+$stdout.sync = true
+
+build_dir = ARGV[1]
+
+app_json = MultiJson.decode(File.read(File.join(build_dir, 'app.json')))
+
+deps_json = app_json['dependencies'].to_json
+chamber_url = URI.parse(ENV.fetch('CHAMBER_HOST', 'https://chamber-production.herokuapp.com'))
+client = Net::HTTP.new(chamber_url.host, chamber_url.port)
+
+req = client.send_request(
+        'PUT',
+        '/v1/apps/#{app_uuid}/dependencies',
+        MultiJson.encode(deps_json),
+        { "content-type" => "application/json" }
+      )
+
+exit 1 unless req.status == 204

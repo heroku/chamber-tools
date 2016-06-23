@@ -1,0 +1,8 @@
+#!/usr/bin/sh
+
+if [ -f $1/app.json ]; then
+  echo "service"
+  exit 0
+fi
+
+exit 1

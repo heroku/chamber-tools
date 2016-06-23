@@ -34,4 +34,4 @@ req = client.send_request(
         { "content-type" => "application/json" }
       )
 
-exit 1 unless req.status == 204
+exit 1 unless req.code == '204'

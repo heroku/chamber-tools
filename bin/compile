@@ -15,8 +15,6 @@ push_metadata = YAML.load(File.read('/app/tmp/push_metadata.yml'))
 
 app_uuid = push_metadata['app_info']['id']
 
-puts push_metadata
-
 deps_json = app_json['dependencies']
 exit 0 if deps_json.nil?
 
